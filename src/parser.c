@@ -27,7 +27,7 @@ int update_option(option_table opt_list, const char *opt)
     return -1;
 }
 
-int parser(option_table table, int argc, char *argv[])
+int parser(option_table table, int argc, const char *argv[])
 {
 
     int flag = -1;

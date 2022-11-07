@@ -17,7 +17,7 @@
 
 #define NBOPT 12
 
-int check_arg(option **table, int argc, char const *argv[])
+int check_arg(option **table, int argc, const char *argv[])
 {
     if (argc == 1)
     {
@@ -40,7 +40,35 @@ int check_arg(option **table, int argc, char const *argv[])
     return 1;
 }
 
-int main(int argc, char const *argv[])
+int parcour(const char *name, option_table table, int prof)
+{
+    int trouve = 0;
+    struct dirent *current;
+    DIR *d = opendir(name);
+
+    while ((current = readdir(d)) != NULL)
+    {
+        if (current->d_name[0] == '.')
+        {
+            continue;
+        }
+        printf("%s/%s\n", name, current->d_name);
+        // printf("\33[%dC├ %s\n", prof * 3, current->d_name);
+        if (current->d_type == 4)
+        {
+            char PATH[512];
+            strcpy(PATH, name);
+            strcat(PATH, "/");
+            strcat(PATH, current->d_name);
+
+            trouve = trouve | parcour(PATH, table, prof + 1);
+        }
+    }
+    free(d);
+    return trouve;
+}
+
+int main(int argc, const char *argv[])
 {
     option *optable[NBOPT];
 
@@ -74,6 +102,8 @@ int main(int argc, char const *argv[])
         destroy_optable(optable, NBOPT);
         exit(EXIT_SUCCESS);
     }
+
+    parcour(argv[1], optable, 0);
 
     destroy_optable(optable, NBOPT);
 
