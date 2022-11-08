@@ -1,5 +1,5 @@
 #include "parser.h"
-#include "checke_param.h"
+#include "check_param.h"
 #include <dirent.h>
 
 #define NAME 0
@@ -21,13 +21,13 @@ int check_arg(option **table, int argc, const char *argv[])
 {
     if (argc == 1)
     {
-        printf("manque la source\n");
+        printf("Missing argument\n");
         return 0;
     }
     DIR *d = opendir(argv[1]);
     if (!d)
     {
-        printf("le dossier %s n'existe pas\n", argv[1]);
+        printf("%s directory not found.\n", argv[1]);
         free(d);
         return 0;
     }
@@ -40,9 +40,9 @@ int check_arg(option **table, int argc, const char *argv[])
     return 1;
 }
 
-int parcour(const char *name, option_table table, int prof)
+int parcour(const char *name, option_table table, int depth)
 {
-    int trouve = 0;
+    int found = 0;
     struct dirent *current;
     DIR *d = opendir(name);
 
@@ -53,7 +53,7 @@ int parcour(const char *name, option_table table, int prof)
             continue;
         }
         printf("%s/%s\n", name, current->d_name);
-        // printf("\33[%dC├ %s\n", prof * 3, current->d_name);
+        // printf("\33[%dC├ %s\n", depth * 3, current->d_name);
         if (current->d_type == 4)
         {
             char PATH[512];
@@ -61,11 +61,11 @@ int parcour(const char *name, option_table table, int prof)
             strcat(PATH, "/");
             strcat(PATH, current->d_name);
 
-            trouve = trouve | parcour(PATH, table, prof + 1);
+            found = found | parcour(PATH, table, depth + 1);
         }
     }
     free(d);
-    return trouve;
+    return found;
 }
 
 int main(int argc, const char *argv[])
@@ -73,7 +73,7 @@ int main(int argc, const char *argv[])
     option *optable[NBOPT];
 
     optable[NAME] = init_option("name", &check_name_param);
-    optable[SIZE] = init_option("size", &check_no_param);
+    optable[SIZE] = init_option("size", &check_size_param);
     optable[DATE] = init_option("date", &check_no_param);
     optable[MIME] = init_option("mime", &check_no_param);
     optable[CTC] = init_option("ctc", &check_no_param);
