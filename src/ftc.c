@@ -99,9 +99,10 @@ int main(int argc, const char *argv[])
     {
         for (int i = 0; i < NBOPT; i++)
         {
-            if (optable[i]->activated)
+            if ((optable[i]->activated))
             {
                 printf("La valeur du flag -%s est %s\n", optable[i]->name, optable[i]->parameter_value);
+                break;
             }
         }
         destroy_optable(optable, NBOPT);
