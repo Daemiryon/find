@@ -28,4 +28,4 @@ ftc.o: src/parser.h src/check_param.h src/ftc.c
 # -----
 # clean obj and exe repertories
 clean:
-	@rm -f obj/*.o ftc
+	@rm -f *.o ftc
