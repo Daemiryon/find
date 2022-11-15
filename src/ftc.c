@@ -52,13 +52,18 @@ int parcour(const char *name, option_table table, int depth)
         {
             continue;
         }
+
         printf("%s/%s\n", name, current->d_name);
         // printf("\33[%dC├ %s\n", depth * 3, current->d_name);
         if (current->d_type == 4)
         {
             char PATH[512];
             strcpy(PATH, name);
-            strcat(PATH, "/");
+            if (PATH[strlen(PATH) - 1] != '/')
+            {
+                strcat(PATH, "/");
+            }
+
             strcat(PATH, current->d_name);
 
             found = found | parcour(PATH, table, depth + 1);
@@ -73,7 +78,7 @@ int main(int argc, const char *argv[])
     option *optable[NBOPT];
 
     optable[NAME] = init_option("name", &check_name_param);
-    optable[SIZE] = init_option("size", &check_size_param);
+    optable[SIZE] = init_option("size", &check_no_param);
     optable[DATE] = init_option("date", &check_no_param);
     optable[MIME] = init_option("mime", &check_no_param);
     optable[CTC] = init_option("ctc", &check_no_param);
