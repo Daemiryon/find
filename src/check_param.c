@@ -13,28 +13,7 @@ int check_no_param(option *opt)
 
 int check_name_param(option *opt)
 {
-    if (opt->activated)
-    {
-        if (!strcmp(opt->parameter_value,""))
-        {
-            printf("Missing argmuent : -name option takes \"file_name.file_extension\" argument.\n");
-            return 0;
-        }
-        int i = strlen(opt->parameter_value)-1;
-        while (i>0)
-        {
-            if (opt->parameter_value[i] == '.')
-            {
-                return 1;
-            }
-            i--;
-        }
-        printf("Invalid argmuent %s : -name option takes \"file_name.file_extension\" argument.\n",opt->parameter_value);
-        return 0;
-    }
-    return 1;
-    
-    
+    return 1;    
 }
 
 // int check_size_param(option *opt)
