@@ -46,7 +46,7 @@ int parcour(const char *name, option_table table, int prof)
     struct dirent *current;
     DIR *d = opendir(name);
 
-    while ((current = readdir(d)) != NULL)
+    while (d && (current = readdir(d)) != NULL)
     {
         if (current->d_name[0] == '.')
         {
@@ -64,7 +64,8 @@ int parcour(const char *name, option_table table, int prof)
             trouve = trouve | parcour(PATH, table, prof + 1);
         }
     }
-    free(d);
+    closedir(d);
+    // free(d);
     return trouve;
 }
 
