@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "check_param.h"
 #include <dirent.h>
+#include <sys/stat.h>
 
 #define NAME 0
 #define SIZE 1
@@ -40,35 +41,59 @@ int check_arg(option **table, int argc, const char *argv[])
     return 1;
 }
 
-int parcour(const char *name, option_table table, int depth)
+int filter(char *path, char *name, option_table table)
+{
+    int check = 1;
+    struct stat *stat;
+    lstat(path, stat);
+
+    if (table[NAME]->activated)
+    {
+    }
+    if (table[_DIR]->activated)
+    {
+    }
+    if (table[SIZE]->activated)
+    {
+    }
+    if (table[PERM]->activated)
+    {
+    }
+    return check;
+}
+
+int parcour(const char *path, option_table table, int depth)
 {
     int found = 0;
     struct dirent *current;
-    DIR *d = opendir(name);
+    DIR *d = opendir(path);
 
     while (d && (current = readdir(d)) != NULL)
     {
+        char PATH[512];
+        strcpy(PATH, path);
+        if (PATH[strlen(PATH) - 1] != '/')
+        {
+            strcat(PATH, "/");
+        }
+        strcat(PATH, current->d_name);
+
         if (current->d_name[0] == '.')
         {
             continue;
         }
 
-        printf("%s/%s\n", name, current->d_name);
-        // printf("\33[%dC├ %s\n", depth * 3, current->d_name);
+        if (!table[NAME]->activated | strcmp(table[NAME]->parameter_value, current->d_name) == 0)
+        {
+            printf("%s\n", PATH);
+        }
+
         if (current->d_type == 4)
         {
-            char PATH[512];
-            strcpy(PATH, name);
-            if (PATH[strlen(PATH) - 1] != '/')
-            {
-                strcat(PATH, "/");
-            }
-
-            strcat(PATH, current->d_name);
-
             found = found | parcour(PATH, table, depth + 1);
         }
     }
+
     closedir(d);
     return found;
 }
