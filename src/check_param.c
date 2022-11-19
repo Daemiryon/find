@@ -16,29 +16,32 @@ int check_name_param(option *opt)
     return 1;    
 }
 
-// int check_size_param(option *opt)
-// {
-//     if (opt->activated)
-//     {
-//         regex_t size_regex;
-//         int test;
+int check_size_param(option *opt)
+{
+    if (opt->activated)
+    {
+        regex_t size_regex;
+        int test;
         
-//         test = regcomp(&size_regex,"(\+|-)?:digit:+[ckMG]",0);
-//         if (test){
-//             printf("Regex error");
-//             return 0;
-//         }
-//         test = regexec(&size_regex,opt->parameter_value,0,NULL,0);
-//         if (test == REG_NOMATCH)
-//         {
-//             printf("Invalid argument %s for -size option.",opt->parameter_value);
-//             return 0;
-//         }
-//         printf("test");
-//     }
-//     return 1;
+        test = regcomp(&size_regex,"[+-]\\?[0-9][0-9]*[ckMG]",0);
+        if (test){
+            printf("Regex error\n");
+            regfree(&size_regex);
+            return 0;
+        }
+        printf("%s\n",opt->parameter_value);
+        test = regexec(&size_regex,opt->parameter_value,0,NULL,0);
+        regfree(&size_regex);
+        if (test == REG_NOMATCH)
+        {
+            printf("Invalid argument %s for -size option.\n",opt->parameter_value);
+            return 0;
+        }
+        printf("%d\n",test);
+    }
+    return 1;
     
-// }
+}
 // int check_date_param(option *opt);
 // int check_mime_param(option *opt);
 // int check_ctc_param(option *opt);
