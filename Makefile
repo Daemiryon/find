@@ -1,6 +1,6 @@
 # Macros
-# exec = clang -Wall -Wextra -pedantic -O0 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls
-# comp = clang -c -Wall -Wextra -pedantic -O0 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls
+# exec = clang -Wall -Wextra -pedantic -O0 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address
+# comp = clang -c -Wall -Wextra -pedantic -O0 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address
 exec = clang -Wall
 comp = clang -c -Wall 
 toexe = -o
@@ -26,6 +26,9 @@ check_param.o: src/check_param.h src/parser.h src/check_param.c
 
 ftc.o: src/parser.h src/check_param.h src/ftc.c
 	$(comp) src/ftc.c $(toobj) ftc.o
+
+list.o: src/list.h src/list.c
+	$(comp) src/list.c $(toobj) list.o
 
 # -----
 # clean obj and exe repertories

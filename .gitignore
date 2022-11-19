@@ -97,3 +97,8 @@ tags
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,vim,c
+
+# Other files
+testlist
+testlist.c
+src/Makefile
