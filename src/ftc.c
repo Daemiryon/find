@@ -125,7 +125,7 @@ int main(int argc, const char *argv[])
         {
             if ((optable[i]->activated))
             {
-                printf("La valeur du flag -%s est %s\n", optable[i]->name, optable[i]->parameter_value);
+                printf("La valeur du flag -%s est %s.\n", optable[i]->name, optable[i]->parameter_value);
                 break;
             }
         }
