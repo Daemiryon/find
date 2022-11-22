@@ -11,13 +11,13 @@ typedef struct option
     char *name;
     int activated;
     char parameter_value[256];
-    int (*check_opt_parameter)(struct option *opt);
+    int (*check_opt_parameter)(char *param);
     int (*opt_filter)(char* path,struct dirent *file, struct option opt);
 } option;
 
 typedef option *option_table[];
 
-option *init_option(char *opt_name, int (*check_opt_parameter)(option *opt));
+option *init_option(char *opt_name, int (*check_opt_parameter)(char *param));
 
 void destroy_option(option *opt);
 

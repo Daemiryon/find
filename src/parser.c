@@ -1,6 +1,6 @@
 #include "parser.h"
 
-option *init_option(char *opt_name, int (*check_opt_parameter)(option *))
+option *init_option(char *opt_name, int (*check_opt_parameter)(char *))
 {
     option *opt = calloc(1, sizeof(option));
     opt->name = opt_name;
@@ -56,7 +56,7 @@ int parser(option_table table, int argc, const char *argv[])
     for (int i = 0; i < 12; i++)
     {
         option *opt = table[i];
-        if (!opt->check_opt_parameter(opt))
+        if ((opt->activated)&(!opt->check_opt_parameter(opt->parameter_value)))
         {
             return 0;
         }

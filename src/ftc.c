@@ -1,6 +1,5 @@
 #include "parser.h"
 #include "check_param.h"
-#include <dirent.h>
 #include <sys/stat.h>
 
 #define NAME 0
@@ -83,7 +82,7 @@ int parcour(const char *path, option_table table, int depth)
             continue;
         }
 
-        if (!table[NAME]->activated | strcmp(table[NAME]->parameter_value, current->d_name) == 0)
+        if ((!table[NAME]->activated) | (strcmp(table[NAME]->parameter_value, current->d_name) == 0))
         {
             printf("%s\n", PATH);
         }
@@ -103,15 +102,15 @@ int main(int argc, const char *argv[])
     option *optable[NBOPT];
 
     optable[NAME] = init_option("name", &check_name_param);
-    optable[SIZE] = init_option("size", &check_no_param);
-    optable[DATE] = init_option("date", &check_no_param);
+    optable[SIZE] = init_option("size", &check_size_param);
+    optable[DATE] = init_option("date", &check_date_param);
     optable[MIME] = init_option("mime", &check_no_param);
-    optable[CTC] = init_option("ctc", &check_no_param);
-    optable[_DIR] = init_option("dir", &check_no_param);
+    optable[CTC] = init_option("ctc", &check_ctc_param);
+    optable[_DIR] = init_option("dir", &check_dir_param);
     optable[COLOR] = init_option("color", &check_no_param);
-    optable[PERM] = init_option("perm", &check_no_param);
+    optable[PERM] = init_option("perm", &check_perm_param);
     optable[LINK] = init_option("link", &check_no_param);
-    optable[THREADS] = init_option("threads", &check_no_param);
+    optable[THREADS] = init_option("threads", &check_threads_param);
     optable[OU] = init_option("ou", &check_no_param);
     optable[TEST] = init_option("test", &check_no_param);
 
