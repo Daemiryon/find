@@ -16,7 +16,7 @@ void destroy_option(option *opt)
 
 int update_option(option_table opt_list, const char *opt)
 {
-    for (unsigned int j = 0; j < 12; j++)
+    for (unsigned int j = 0; j < 13; j++)
     {
         if (strcmp(opt_list[j]->name, opt) == 0)
         {
@@ -29,11 +29,14 @@ int update_option(option_table opt_list, const char *opt)
 
 int parser(option_table table, int argc, const char *argv[])
 {
-
-    int flag = -1;
+    int flag = 12;
     for (int i = 0; i < argc; i++)
     {
-        if (argv[i][0] == '-')
+        if (table[flag]->check_opt_parameter(argv[i])&!strlen(table[flag]->parameter_value))
+        {
+            strcpy(table[flag]->parameter_value, argv[i]);
+        }
+        else if (argv[i][0] == '-')
         {
             flag = update_option(table, argv[i] + 1);
             if (flag == -1)
@@ -43,23 +46,6 @@ int parser(option_table table, int argc, const char *argv[])
             }
         }
 
-        else if (flag != -1)
-        {
-            if (strlen(table[flag]->parameter_value))
-            {
-                strcat(table[flag]->parameter_value, " ");
-            }
-
-            strcat(table[flag]->parameter_value, argv[i]);
-        }
-    }
-    for (int i = 0; i < 12; i++)
-    {
-        option *opt = table[i];
-        if ((opt->activated)&(!opt->check_opt_parameter(opt->parameter_value)))
-        {
-            return 0;
-        }
     }
     return 1;
 }

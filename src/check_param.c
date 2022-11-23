@@ -1,10 +1,11 @@
 #include "check_param.h"
+#include <dirent.h>
 
 int check_no_param(char *param)
 {
     if (strlen(param))
     {
-        printf("Invalid argument %s : option does not take any argument.\n", param);
+        // printf("Invalid argument %s : option does not take any argument.\n", param);
         return 0;
     }
     return 1;
@@ -66,7 +67,7 @@ int check_dir_param(char *param)
     return 1;
 }
 
-// int check_color_param(char *param);
+// int check_color_param(char *param);     //= check_no_param()
 
 int check_perm_param(char *param)
 {
@@ -87,7 +88,7 @@ int check_perm_param(char *param)
     return 1;
 }
 
-// int check_link_param(char *param);
+// int check_link_param(char *param);     //= check_no_param()
 
 int check_threads_param(char *param)
 {
@@ -108,5 +109,18 @@ int check_threads_param(char *param)
     return 1;
 };
 
-// int check_ou_param(char *param);
-// int check_test_param(char *param);
+// int check_ou_param(char *param);       //= check_no_param()
+// int check_test_param(char *param);     //= check_no_param()
+
+int check_source_param(char *param)
+{
+    DIR *d = opendir(param);
+    if (!d)
+    {
+        // printf("%s directory not found.\n", param);
+        free(d);
+        return 0;
+    }
+    free(d);
+    return 1;
+}

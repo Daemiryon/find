@@ -14,8 +14,9 @@
 #define THREADS 9
 #define OU 10
 #define TEST 11
+#define SOURCE 12
 
-#define NBOPT 12
+#define NBOPT 13
 
 int check_arg(option **table, int argc, const char *argv[])
 {
@@ -24,20 +25,9 @@ int check_arg(option **table, int argc, const char *argv[])
         printf("Missing argument\n");
         return 0;
     }
-    DIR *d = opendir(argv[1]);
-    if (!d)
-    {
-        printf("%s directory not found.\n", argv[1]);
-        free(d);
-        return 0;
-    }
-    free(d);
-    if (argc > 2)
-    {
-        return parser(table, argc - 2, argv + 2);
-    }
 
-    return 1;
+    return parser(table, argc - 1, argv + 1);
+
 }
 
 int filter(char *path, char *name, option_table table)
@@ -113,6 +103,9 @@ int main(int argc, const char *argv[])
     optable[THREADS] = init_option("threads", &check_threads_param);
     optable[OU] = init_option("ou", &check_no_param);
     optable[TEST] = init_option("test", &check_no_param);
+    optable[SOURCE] = init_option("source", &check_source_param);
+
+    optable[SOURCE]->activated=1;
 
     if (!check_arg(optable, argc, argv))
     {
@@ -121,17 +114,18 @@ int main(int argc, const char *argv[])
 
     if (optable[TEST]->activated)
     {
-        for (int i = 0; i < NBOPT; i++)
+        for (int i = 0; i < NBOPT-2; i++)
         {
             if ((optable[i]->activated))
             {
                 printf("La valeur du flag -%s est %s\n", optable[i]->name, optable[i]->parameter_value);
-                break;
+                // break;
             }
         }
         destroy_optable(optable, NBOPT);
         exit(EXIT_SUCCESS);
     }
+
 
     parcour(argv[1], optable, 0);
 
