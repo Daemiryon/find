@@ -10,8 +10,8 @@ toobj = -o
 # Exécutable
 # # fichier.exe: dépendances .o
 # # 	$(exec) .o $(toexe) fichier.exe
-ftc: ftc.o parser.o check_param.o
-	$(exec) ftc.o parser.o check_param.o $(toexe) ftc
+ftc: ftc.o parser.o check_param.o MegaMimes.o
+	$(exec) ftc.o parser.o check_param.o MegaMimes.o $(toexe) ftc
 
 # -----
 # Compilation
@@ -29,6 +29,9 @@ ftc.o: src/parser.h src/check_param.h src/ftc.c
 
 list.o: src/list.h src/list.c
 	$(comp) src/list.c $(toobj) list.o
+
+MegaMimes.o: src/MegaMimes.h src/MegaMimes.c
+	$(comp) src/MegaMimes.c $(toobj) MegaMimes.o
 
 # -----
 # clean obj and exe repertories
