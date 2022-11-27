@@ -2,6 +2,9 @@
 #define __FILTERS_H__
 
 #include "parser.h"
+#include <dirent.h>
+#include <sys/stat.h>
+#include <regex.h>
 
 int no_filter(char* path, struct dirent *file, option *opt);
 

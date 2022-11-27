@@ -1,11 +1,12 @@
 #include "parser.h"
 
-option *init_option(char *opt_name, int (*check_opt_parameter)(char *))
+option *init_option(char *opt_name, int (*check_opt_parameter)(char *), int *(opt_filter)(char*, struct dirent, option))
 {
     option *opt = calloc(1, sizeof(option));
     opt->name = opt_name;
     opt->activated = 0;
     opt->check_opt_parameter = *check_opt_parameter;
+    opt->opt_filter = *opt_filter;
     return opt;
 }
 

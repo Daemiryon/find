@@ -17,7 +17,7 @@ typedef struct option
 
 typedef option *option_table[];
 
-option *init_option(char *opt_name, int (*check_opt_parameter)(char *param));
+option *init_option(char *opt_name, int (*check_opt_parameter)(char *param), int *(opt_filter)(char*, struct dirent, option));
 
 void destroy_option(option *opt);
 
