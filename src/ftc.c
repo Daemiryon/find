@@ -94,7 +94,7 @@ int main(int argc, const char *argv[])
     optable[NAME] = init_option("name", &check_name_param);
     optable[SIZE] = init_option("size", &check_size_param);
     optable[DATE] = init_option("date", &check_date_param);
-    optable[MIME] = init_option("mime", &check_no_param);
+    optable[MIME] = init_option("mime", &check_mime_param);
     optable[CTC] = init_option("ctc", &check_ctc_param);
     optable[_DIR] = init_option("dir", &check_dir_param);
     optable[COLOR] = init_option("color", &check_no_param);
@@ -119,7 +119,7 @@ int main(int argc, const char *argv[])
             if ((optable[i]->activated))
             {
                 printf("La valeur du flag -%s est %s\n", optable[i]->name, optable[i]->parameter_value);
-                // break;
+                break;
             }
         }
         destroy_optable(optable, NBOPT);

@@ -1,5 +1,24 @@
 #include "check_param.h"
+#include "MegaMimes.h"
 #include <dirent.h>
+
+int check_with_regex(char* param, char* regex){
+    regex_t regex_struct;
+    int test = regcomp(&regex_struct,regex,0);
+    if (test){
+        printf("Regex error\n");
+        regfree(&regex_struct);
+        return 0;
+    }
+    test = regexec(&regex_struct,param,0,NULL,0);
+    regfree(&regex_struct);
+    if (test == REG_NOMATCH)
+    {
+        return 0;
+    }
+    return 1;
+}
+
 
 int check_no_param(char *param)
 {
@@ -19,43 +38,30 @@ int check_name_param(char *param)
 
 int check_size_param(char *param)
 {
-    regex_t size_regex;
-    int test = regcomp(&size_regex,"[+-]\\?[0-9]\\+[ckMG]",0);
-    if (test){
-        printf("Regex error\n");
-        regfree(&size_regex);
-        return 0;
-    }
-    test = regexec(&size_regex,param,0,NULL,0);
-    regfree(&size_regex);
-    if (test == REG_NOMATCH)
-    {
-        //printf("Invalid argument %s for -size option.\n",param);
-        return 0;
-    }
-    return 1;
+    return check_with_regex(param,"[+-]\\?[0-9]\\+[ckMG]");
 }
 
 int check_date_param(char *param)
 {
-    regex_t date_regex;
-    int test = regcomp(&date_regex,"[+]\\?[0-9]\\+[jhm]",0);
-    if (test){
-        printf("Regex error\n");
-        regfree(&date_regex);
-        return 0;
-    }
-    test = regexec(&date_regex,param,0,NULL,0);
-    regfree(&date_regex);
-    if (test == REG_NOMATCH)
-    {
-        //printf("Invalid argument %s for -date option.\n",param);
-        return 0;
-    }
-    return 1;
+    return check_with_regex(param,"[+]\\?[0-9]\\+[jhm]");
 }
 
-// int check_mime_param(char *param);
+int check_mime_param(char *param){
+    char *mime;
+    if (strchr(param,'/'))    // Cas où on a l'option "-mime type/sous-type"
+    {
+        mime = param;   
+    }
+    else                                            // Cas où on a l'option "-mime type"
+    {
+        mime = strcat(param,"/*");
+    }
+    if (getMegaMimeExtensions(mime) == NULL)
+    {
+        return 0;
+    } 
+    return 1;
+}
 
 int check_ctc_param(char *param)
 {
@@ -71,42 +77,14 @@ int check_dir_param(char *param)
 
 int check_perm_param(char *param)
 {
-    regex_t perm_regex;
-    int test = regcomp(&perm_regex,"[0-7][0-7][0-7]",0);
-    if (test){
-        printf("Regex error\n");
-        regfree(&perm_regex);
-        return 0;
-    }
-    test = regexec(&perm_regex,param,0,NULL,0);
-    regfree(&perm_regex);
-    if (test == REG_NOMATCH)
-    {
-        //printf("Invalid argument %s for -perm option.\n",param);
-        return 0;
-    }
-    return 1;
+    return check_with_regex(param,"[0-7][0-7][0-7]");
 }
 
 // int check_link_param(char *param);     //= check_no_param()
 
 int check_threads_param(char *param)
 {
-    regex_t thread_regex;
-    int test = regcomp(&thread_regex,"[0-9]\\+",0);
-    if (test){
-        printf("Regex error\n");
-        regfree(&thread_regex);
-        return 0;
-    }
-    test = regexec(&thread_regex,param,0,NULL,0);
-    regfree(&thread_regex);
-    if (test == REG_NOMATCH)
-    {
-        //printf("Invalid argument %s for -thread option.\n",param);
-        return 0;
-    }
-    return 1;
+    return check_with_regex(param,"[0-9]\\+");
 };
 
 // int check_ou_param(char *param);       //= check_no_param()

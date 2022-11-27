@@ -41,7 +41,7 @@ int parser(option_table table, int argc, const char *argv[])
             flag = update_option(table, argv[i] + 1);
             if (flag == -1)
             {
-                printf("l'option %s n'existe pas \n", argv[i] + 1);
+                printf("-%s option does not exist\n", argv[i] + 1);
                 return 0;
             }
         }
