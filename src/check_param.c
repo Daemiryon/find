@@ -22,13 +22,13 @@ int check_with_regex(char* param, char* regex){
 
 int check_no_param(char *param)
 {
-    if (strlen(param))
-    {
-        // printf("Invalid argument %s : option does not take any argument.\n", param);
-        return 0;
-    }
-    return 1;
-    //return !strlen(param);
+    // if (strlen(param))
+    // {
+    //     // printf("Invalid argument %s : option does not take any argument.\n", param);
+    //     return 0;
+    // }
+    // return 1;
+    return !strlen(param);
 }
 
 int check_name_param(char *param)
@@ -48,7 +48,7 @@ int check_date_param(char *param)
 
 int check_mime_param(char *param){
     char *mime;
-    if (strchr(param,'/'))    // Cas où on a l'option "-mime type/sous-type"
+    if (strchr(param,'/'))                          // Cas où on a l'option "-mime type/sous-type"
     {
         mime = param;   
     }
@@ -70,7 +70,7 @@ int check_ctc_param(char *param)
 
 int check_dir_param(char *param)
 {
-    return 1;
+    return !(param[0] == '-');
 }
 
 // int check_color_param(char *param);     //= check_no_param()

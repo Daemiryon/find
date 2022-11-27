@@ -1,4 +1,5 @@
 #include "filters.h"
+#include "parser.h"
 
 int no_filter(char* path, struct dirent *file, option *opt){
     return 1;

@@ -102,3 +102,4 @@ tags
 testlist
 testlist.c
 src/Makefile
+src/parser.old*
