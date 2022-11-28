@@ -73,6 +73,14 @@ int parcour(const char *path, option_table table, int depth)
 
         if (current->d_name[0] == '.')
         {
+            if (strlen(current->d_name)==1 )
+            {
+                if (!depth & filter(path,current,table))
+                {
+                    printf("%s\n", path);
+                    found = 1;
+                }
+            }
             continue;
         }
 
