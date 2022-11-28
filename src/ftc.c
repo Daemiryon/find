@@ -2,6 +2,7 @@
 #include "filters.h"
 #include "check_param.h"
 #include <sys/stat.h>
+#include <dirent.h>
 
 #define NAME 0
 #define SIZE 1
@@ -31,29 +32,31 @@ int check_arg(option **table, int argc, const char *argv[])
 
 }
 
-int filter(char *path, char *name, option_table table)
+int filter(char *path, struct dirent *file, option_table table)
 {
-    int check = 1;
-    struct stat *stat;
-    lstat(path, stat);
+    int ANDcheck = 1;
+    int ORcheck = 0;
 
-    if (table[NAME]->activated)
-    {
+    for (int i = 0; i < 12; i++)
+    {       
+            
+        if ((table[i]->opt_filter!=NULL) & (table[i]->activated))
+        {            
+            // printf("%s\n",table[SIZE]->parameter_value);
+            int b =table[i]->opt_filter(path,file,table[i]);
+            // printf("%s\n",table[SIZE]->parameter_value);
+            ANDcheck = ANDcheck & b;
+            ORcheck = ORcheck | b;
+        }
+        
     }
-    if (table[_DIR]->activated)
-    {
-    }
-    if (table[SIZE]->activated)
-    {
-    }
-    if (table[PERM]->activated)
-    {
-    }
+    int check = table[OU]->activated ? ORcheck : ANDcheck ;
     return check;
 }
 
 int parcour(const char *path, option_table table, int depth)
 {
+    // printf("%s\n",table[SIZE]->parameter_value);
     int found = 0;
     struct dirent *current;
     DIR *d = opendir(path);
@@ -73,9 +76,10 @@ int parcour(const char *path, option_table table, int depth)
             continue;
         }
 
-        if ((!table[NAME]->activated) | (strcmp(table[NAME]->parameter_value, current->d_name) == 0))
+        if (filter(PATH,current,table))
         {
             printf("%s\n", PATH);
+            found = 1;
         }
 
         if (current->d_type == 4)
@@ -92,19 +96,19 @@ int main(int argc, const char *argv[])
 {
     option *optable[NBOPT];
 
-    optable[NAME] = init_option("name", &check_name_param, &no_filter);
-    optable[SIZE] = init_option("size", &check_size_param, &no_filter);
+    optable[NAME] = init_option("name", &check_name_param, &name_filter);
+    optable[SIZE] = init_option("size", &check_size_param, &size_filter);
     optable[DATE] = init_option("date", &check_date_param, &no_filter);
     optable[MIME] = init_option("mime", &check_mime_param, &no_filter);
     optable[CTC] = init_option("ctc", &check_ctc_param, &no_filter);
-    optable[_DIR] = init_option("dir", &check_dir_param, &no_filter);
-    optable[COLOR] = init_option("color", &check_no_param, &no_filter);
+    optable[_DIR] = init_option("dir", &check_dir_param, &dir_filter);
+    optable[COLOR] = init_option("color", &check_no_param, NULL);
     optable[PERM] = init_option("perm", &check_perm_param, &no_filter);
     optable[LINK] = init_option("link", &check_no_param, &no_filter);
-    optable[THREADS] = init_option("threads", &check_threads_param, &no_filter);
-    optable[OU] = init_option("ou", &check_no_param, &no_filter);
-    optable[TEST] = init_option("test", &check_no_param, &no_filter);
-    optable[SOURCE] = init_option("source", &check_source_param, &no_filter);
+    optable[THREADS] = init_option("threads", &check_threads_param, NULL);
+    optable[OU] = init_option("ou", &check_no_param,NULL);
+    optable[TEST] = init_option("test", &check_no_param, NULL);
+    optable[SOURCE] = init_option("source", &check_source_param,NULL);
 
     optable[SOURCE]->activated=1;
 
@@ -127,8 +131,7 @@ int main(int argc, const char *argv[])
         exit(EXIT_SUCCESS);
     }
 
-
-    parcour(argv[1], optable, 0);
+    parcour(optable[SOURCE]->parameter_value, optable, 0);
 
     destroy_optable(optable, NBOPT);
 
