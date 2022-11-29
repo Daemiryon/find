@@ -37,17 +37,16 @@ int filter(char *path, struct dirent *file, option_table table)
     int ORcheck = 0;
 
     for (int i = 0; i < 12; i++)
-    {       
-            
-        if ((table[i]->opt_filter!=NULL) & (table[i]->activated))
-        {            
-            int b =table[i]->opt_filter(path,file,table[i]);
+    {
+
+        if ((table[i]->opt_filter != NULL) & (table[i]->activated > 0))
+        {
+            int b = table[i]->opt_filter(path, file, table[i]);
             ANDcheck = ANDcheck & b;
             ORcheck = ORcheck | b;
         }
-        
     }
-    int check = table[OU]->activated ? ORcheck : ANDcheck ;
+    int check = table[OU]->activated ? ORcheck : ANDcheck;
     return check;
 }
 
@@ -56,31 +55,35 @@ int parcour(const char *path, option_table table, int depth)
     int found = 0;
     struct dirent *current;
     DIR *d = opendir(path);
+    if (path[strlen(path) - 1] != '/')
+    {
+        strcat(path, "/");
+    }
 
     while (d && (current = readdir(d)) != NULL)
     {
         char PATH[512];
         strcpy(PATH, path);
-        if (PATH[strlen(PATH) - 1] != '/')
-        {
-            strcat(PATH, "/");
-        }
         strcat(PATH, current->d_name);
 
         if (current->d_name[0] == '.')
         {
-            if (strlen(current->d_name)==1 )
+            if (strlen(current->d_name) == 1)
             {
-                if ((!depth) & (filter(path,current,table)))
+                if ((!depth) & (filter(path, current, table)))
                 {
                     printf("%s\n", path);
                     found = 1;
                 }
+                continue;
             }
-            continue;
+            if (strcmp(current->d_name, "..") == 0)
+            {
+                continue;
+            }
         }
 
-        if (filter(PATH,current,table))
+        if (filter(PATH, current, table))
         {
             printf("%s\n", PATH);
             found = 1;
@@ -110,11 +113,11 @@ int main(int argc, const char *argv[])
     optable[PERM] = init_option("perm", &check_perm_param, &perm_filter);
     optable[LINK] = init_option("link", &check_no_param, &no_filter);
     optable[THREADS] = init_option("threads", &check_threads_param, NULL);
-    optable[OU] = init_option("ou", &check_no_param,NULL);
+    optable[OU] = init_option("ou", &check_no_param, NULL);
     optable[TEST] = init_option("test", &check_no_param, NULL);
-    optable[SOURCE] = init_option("source", &check_source_param,NULL);
+    optable[SOURCE] = init_option("source", &check_source_param, NULL);
 
-    optable[SOURCE]->activated=1;
+    optable[SOURCE]->activated = 1;
 
     if (!check_arg(optable, argc, argv))
     {
@@ -123,11 +126,11 @@ int main(int argc, const char *argv[])
 
     if (optable[TEST]->activated)
     {
-        for (int i = 0; i < NBOPT-2; i++)
+        for (int i = 0; i < NBOPT - 2; i++)
         {
             if ((optable[i]->activated))
             {
-                printf("La valeur du flag -%s est %s\n", optable[i]->name, argv[optable[i]->activated+1]);
+                printf("La valeur du flag -%s est %s\n", optable[i]->name, argv[optable[i]->activated + 1]);
                 break;
             }
         }
