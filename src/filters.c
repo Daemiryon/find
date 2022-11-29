@@ -1,5 +1,6 @@
 #include "filters.h"
 #include "parser.h"
+#include "MegaMimes.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/sysmacros.h>
@@ -89,7 +90,24 @@ int size_filter(char* path, struct dirent *file, option *opt)
 }
 
 // int date_filter(char* path, struct dirent *file, struct option opt);
-// int mime_filter(char* path, struct dirent *file, struct option opt);
+
+int mime_filter(char* path, struct dirent *file, option *opt)
+{
+    const char *mimetype = getMegaMimeType(file->d_name);
+    char filter[256];
+    int test;
+    strcpy(filter,opt->parameter_value);
+    if (mimetype == NULL)
+    {
+        return 0;
+    }
+    if ((strchr(opt->parameter_value,'/') == NULL))     // Cas où on a l'option "-mime type"
+    {
+        strcat(filter,"/");
+    }
+    test = !strncmp(filter,mimetype,strlen(filter));
+    return test;   
+}
 
 int ctc_filter(char* path, struct dirent *file, option *opt){
     int match=0;
