@@ -39,7 +39,7 @@ int filter(char *path, struct dirent *file, option_table table)
     for (int i = 0; i < 12; i++)
     {
 
-        if ((table[i]->opt_filter != NULL) & (table[i]->activated))
+        if ((table[i]->opt_filter != NULL) & (table[i]->activated > 0))
         {
             int b = table[i]->opt_filter(path, file, table[i]);
             ANDcheck = ANDcheck & b;
