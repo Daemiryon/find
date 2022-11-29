@@ -105,7 +105,7 @@ int main(int argc, const char *argv[])
 
     optable[NAME] = init_option("name", &check_name_param, &name_filter);
     optable[SIZE] = init_option("size", &check_size_param, &size_filter);
-    optable[DATE] = init_option("date", &check_date_param, &no_filter);
+    optable[DATE] = init_option("date", &check_date_param, &date_filter);
     optable[MIME] = init_option("mime", &check_mime_param, &mime_filter);
     optable[CTC] = init_option("ctc", &check_ctc_param, &ctc_filter);
     optable[_DIR] = init_option("dir", &check_dir_param, &dir_filter);

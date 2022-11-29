@@ -50,6 +50,29 @@ int parse_size_param(char param[256])
     }
 }
 
+int parse_date_param(char param[256])
+{
+    char temp[256];
+    char unit = param[strlen(param)-1];
+    switch (unit)
+    {
+        case 'j':
+            strncpy(temp,param,strlen(param)-1);
+            return atoi(temp)*86400;
+        
+        case 'h':
+            strncpy(temp,param,strlen(param)-1);
+            return atoi(temp)*3600;
+        
+        case 'm':
+            strncpy(temp,param,strlen(param)-1);
+            return atoi(temp)*60;
+        
+        default:
+            return atoi(param);
+    }
+}
+
 
 int no_filter(char* path, struct dirent *file, option *opt)
 {
@@ -89,7 +112,35 @@ int size_filter(char* path, struct dirent *file, option *opt)
     }
 }
 
-// int date_filter(char* path, struct dirent *file, struct option opt);
+int date_filter(char* path, struct dirent *file, option *opt)
+{
+    struct stat sb;
+    long int date;
+    long int filter;
+    time_t current_time = 0;
+    time(&current_time);
+    if (stat(path, &sb) == -1) {
+        perror("stat");
+        return 0;
+    }
+    switch (opt->parameter_value[0])
+    {
+        case '+':
+            filter = current_time-((long int) parse_date_param(opt->parameter_value+1));
+            date = (long int) sb.st_atime;
+            return (date < filter);
+
+        case '-':
+            filter = current_time-((long int) parse_date_param(opt->parameter_value+1));
+            date = (long int) sb.st_atime;
+            return (date > filter);
+
+        default:
+            filter = current_time-((long int) parse_date_param(opt->parameter_value));
+            date = (long int) sb.st_atime;
+            return (date == filter);
+    }
+}
 
 int mime_filter(char* path, struct dirent *file, option *opt)
 {
