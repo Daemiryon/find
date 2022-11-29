@@ -108,7 +108,7 @@ int main(int argc, const char *argv[])
     optable[CTC] = init_option("ctc", &check_ctc_param, &ctc_filter);
     optable[_DIR] = init_option("dir", &check_dir_param, &dir_filter);
     optable[COLOR] = init_option("color", &check_no_param, NULL);
-    optable[PERM] = init_option("perm", &check_perm_param, &no_filter);
+    optable[PERM] = init_option("perm", &check_perm_param, &perm_filter);
     optable[LINK] = init_option("link", &check_no_param, &no_filter);
     optable[THREADS] = init_option("threads", &check_threads_param, NULL);
     optable[OU] = init_option("ou", &check_no_param,NULL);

@@ -158,8 +158,20 @@ int dir_filter(char* path, struct dirent *file, option *opt)
     }
 }
 
+int perm_filter(char* path, struct dirent *file, option *opt)
+{
+    // sb.st_mode
+    struct stat sb;
+    if (stat(path, &sb) == -1) {
+        perror("lstat");
+        return 0;
+    }
+    int mode = ((int) sb.st_mode) % 1000;
+    int filter = atoi(opt->parameter_value);
+    return (filter == mode);
+}
+
 // int color_filter(char* path, struct dirent *file, struct option opt);
-// int perm_filter(char* path, struct dirent *file, struct option opt);
 // int link_filter(char* path, struct dirent *file, struct option opt);
 // int threads_filter(char* path, struct dirent *file, struct option opt);
 // int ou_filter(char* path, struct dirent *file, struct option opt);

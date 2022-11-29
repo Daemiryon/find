@@ -60,7 +60,7 @@ int check_mime_param(char *param){
     {
         test = 0;
     }
-    freeMegaStringArray( (char *) extensions);
+    freeMegaStringArray( (char**) extensions);
     return test;
 }
 
