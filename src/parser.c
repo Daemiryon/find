@@ -34,7 +34,7 @@ int parser(option_table table, int argc, const char *argv[])
     for (int i = 0; i < argc; i++)
     {
         // Cas où on a un paramètre d'option a mettre (si cette option n'a pas déjà de paramètre)
-        if (( table[flag]->check_opt_parameter(argv[i]) ) & ( !strlen(table[flag]->parameter_value) ))
+        if (( table[flag]->check_opt_parameter( (char *) argv[i]) ) & ( !strlen(table[flag]->parameter_value) ))
         {
             strcpy(table[flag]->parameter_value, argv[i]);
         }

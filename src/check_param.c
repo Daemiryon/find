@@ -14,7 +14,7 @@ int check_with_regex(char* param, char* regex){
     regfree(&regex_struct);
     if (test == REG_NOMATCH)
     {
-        printf("No match");
+        // printf("No match");
         return 0;
     }
     return 1;
@@ -48,20 +48,20 @@ int check_date_param(char *param)
 }
 
 int check_mime_param(char *param){
-    char *mime;
-    if (strchr(param,'/'))                          // Cas où on a l'option "-mime type/sous-type"
+    char mime[256];
+    int test = 1;
+    strcpy(mime,param);
+    if (strchr(mime,'/') == NULL)                          // Cas où on a l'option "-mime type"
     {
-        mime = param;   
+        strcat(mime,"/*");  
     }
-    else                                            // Cas où on a l'option "-mime type"
+    const char **extensions = getMegaMimeExtensions(mime);
+    if (extensions == NULL)
     {
-        mime = strcat(param,"/*");
+        test = 0;
     }
-    if (getMegaMimeExtensions(mime) == NULL)
-    {
-        return 0;
-    } 
-    return 1;
+    freeMegaStringArray( (char**) extensions);
+    return test;
 }
 
 int check_ctc_param(char *param)
@@ -86,7 +86,7 @@ int check_perm_param(char *param)
 int check_threads_param(char *param)
 {
     return check_with_regex(param,"[0-9]\\+");
-};
+}
 
 // int check_ou_param(char *param);       //= check_no_param()
 // int check_test_param(char *param);     //= check_no_param()
