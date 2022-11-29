@@ -14,7 +14,7 @@ int check_with_regex(char* param, char* regex){
     regfree(&regex_struct);
     if (test == REG_NOMATCH)
     {
-        printf("No match");
+        // printf("No match");
         return 0;
     }
     return 1;
