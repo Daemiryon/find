@@ -42,9 +42,7 @@ int filter(char *path, struct dirent *file, option_table table)
             
         if ((table[i]->opt_filter!=NULL) & (table[i]->activated))
         {            
-            // printf("%s\n",table[SIZE]->parameter_value);
             int b =table[i]->opt_filter(path,file,table[i]);
-            // printf("%s\n",table[SIZE]->parameter_value);
             ANDcheck = ANDcheck & b;
             ORcheck = ORcheck | b;
         }
@@ -56,7 +54,6 @@ int filter(char *path, struct dirent *file, option_table table)
 
 int parcour(const char *path, option_table table, int depth)
 {
-    // printf("%s\n",table[SIZE]->parameter_value);
     int found = 0;
     struct dirent *current;
     DIR *d = opendir(path);
@@ -108,7 +105,7 @@ int main(int argc, const char *argv[])
     optable[SIZE] = init_option("size", &check_size_param, &size_filter);
     optable[DATE] = init_option("date", &check_date_param, &no_filter);
     optable[MIME] = init_option("mime", &check_mime_param, &no_filter);
-    optable[CTC] = init_option("ctc", &check_ctc_param, &no_filter);
+    optable[CTC] = init_option("ctc", &check_ctc_param, &ctc_filter);
     optable[_DIR] = init_option("dir", &check_dir_param, &dir_filter);
     optable[COLOR] = init_option("color", &check_no_param, NULL);
     optable[PERM] = init_option("perm", &check_perm_param, &no_filter);

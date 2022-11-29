@@ -90,7 +90,31 @@ int size_filter(char* path, struct dirent *file, option *opt)
 
 // int date_filter(char* path, struct dirent *file, struct option opt);
 // int mime_filter(char* path, struct dirent *file, struct option opt);
-// int ctc_filter(char* path, struct dirent *file, struct option opt);
+
+int ctc_filter(char* path, struct dirent *file, option *opt){
+    int match=0;
+    long length;
+    char * buffer = 0;
+    FILE *f = fopen(path, "r");
+    if (!f)
+    {
+        return 0;
+    }
+    fseek (f, 0, SEEK_END);
+    length = ftell (f);
+    fseek (f, 0, SEEK_SET);
+    buffer = malloc (length);
+    if (buffer)
+    {
+        fread (buffer, 1, length, f);
+        match = filter_with_regex(opt->parameter_value,buffer);
+    }
+    
+    free(buffer);
+    fclose (f);
+
+    return match;
+}
 
 int dir_filter(char* path, struct dirent *file, option *opt)
 {
