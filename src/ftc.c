@@ -29,7 +29,6 @@ int check_arg(option **table, int argc, const char *argv[])
     }
 
     return parser(table, argc - 1, argv + 1);
-
 }
 
 int filter(char *path, struct dirent *file, option_table table)
@@ -128,7 +127,7 @@ int main(int argc, const char *argv[])
         {
             if ((optable[i]->activated))
             {
-                printf("La valeur du flag -%s est %s\n", optable[i]->name, optable[i]->parameter_value);
+                printf("La valeur du flag -%s est %s\n", optable[i]->name, argv[optable[i]->activated+1]);
                 break;
             }
         }
@@ -137,7 +136,6 @@ int main(int argc, const char *argv[])
     }
 
     parcour(optable[SOURCE]->parameter_value, optable, 0);
-
     destroy_optable(optable, NBOPT);
 
     return 0;

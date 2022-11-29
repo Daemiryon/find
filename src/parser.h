@@ -23,7 +23,7 @@ void destroy_option(option *opt);
 
 void destroy_optable(option_table optable, int size);
 
-int update_option(option_table opt_list, const char *opt);
+int update_option(option_table opt_list, const char *opt,int index);
 
 int parser(option_table table, int argc, const char *argv[]);
 
