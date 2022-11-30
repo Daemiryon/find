@@ -5,7 +5,17 @@
 #include <sys/types.h>
 #include <sys/sysmacros.h>
 
+// Fonctions auxiliaires
 int filter_with_regex(char *regex,char* data)
+/*
+    Fonction qui vérifie que la regex match avec la donnée.
+
+    Paramètres :
+    - regex (char *) : Regex
+    - data (char *) : Donnée à comparer avec la regex
+
+    La valeur de retour est un booléen.
+*/
 {
     regex_t regex_filter;
     int test = regcomp(&regex_filter,regex,REG_EXTENDED);
@@ -24,6 +34,14 @@ int filter_with_regex(char *regex,char* data)
 }
 
 int parse_size_param(char param[256])
+/*
+    Fonction qui convertit le paramtre du flag -size en bytes.
+
+    Paramètres :
+    - param (char[256]) : Paramètre du flag
+
+    La valeur de retour est un entier.
+*/
 {
     char temp[256];
     char unit = param[strlen(param)-1];
@@ -51,6 +69,14 @@ int parse_size_param(char param[256])
 }
 
 int parse_date_param(char param[256])
+/*
+    Fonction qui convertit le paramtre du flag -date en secondes.
+
+    Paramètres :
+    - param (char[256]) : Paramètre du flag
+
+    La valeur de retour est un entier.
+*/
 {
     char temp[256];
     char unit = param[strlen(param)-1];
@@ -73,18 +99,52 @@ int parse_date_param(char param[256])
     }
 }
 
-
+// -----
+// Flags sans filtres
 int no_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction utile aux flags qui n'effectuent aucun filtrage des résultats du parcours.
+    Les paramètres de cette option n'existe que pour respecter le formalisme de la structure "option" définie dans le fichier "parser.h".
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen (vrai).
+*/
 {
     return 1;
 }
 
+// -----
+// Flags avec filtres
 int name_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction qui filtre les résultats du parcours suivant le paramètre du flag -name.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen.
+*/
 {
     return filter_with_regex(opt->parameter_value,file->d_name);
 }
 
 int size_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction qui filtre les résultats du parcours suivant le paramètre du flag -size.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen.
+*/
 {
     struct stat sb;
     int size;
@@ -113,6 +173,16 @@ int size_filter(char* path, struct dirent *file, option *opt)
 }
 
 int date_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction qui filtre les résultats du parcours suivant le paramètre du flag -date.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen.
+*/
 {
     struct stat sb;
     long int date;
@@ -143,6 +213,16 @@ int date_filter(char* path, struct dirent *file, option *opt)
 }
 
 int mime_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction qui filtre les résultats du parcours suivant le paramètre du flag -mime.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen.
+*/
 {
     const char *mimetype = getMegaMimeType(file->d_name);
     char filter[256];
@@ -160,7 +240,18 @@ int mime_filter(char* path, struct dirent *file, option *opt)
     return test;   
 }
 
-int ctc_filter(char* path, struct dirent *file, option *opt){
+int ctc_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction qui filtre les résultats du parcours suivant le paramètre du flag -ctc.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen.
+*/
+{
     int match=0;
     long length;
     char * buffer = 0;
@@ -186,6 +277,18 @@ int ctc_filter(char* path, struct dirent *file, option *opt){
 }
 
 int dir_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction qui filtre les résultats du parcours
+    - en vérifiant qu'il s'agisse bien de répertoires
+    - suivant le paramètre du flag -dir (s'il y en a un).
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen.
+*/
 {
     struct stat sb;
     if (stat(path, &sb) == -1) {
@@ -210,8 +313,17 @@ int dir_filter(char* path, struct dirent *file, option *opt)
 }
 
 int perm_filter(char* path, struct dirent *file, option *opt)
+/*
+    Fonction qui filtre les résultats du parcours suivant le paramètre du flag -perm.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent *) : fichier
+    - opt (option *) : Flag
+
+    La valeur de retour est un booléen.
+*/
 {
-    // sb.st_mode
     struct stat sb;
     if (stat(path, &sb) == -1) {
         perror("lstat");
@@ -222,8 +334,11 @@ int perm_filter(char* path, struct dirent *file, option *opt)
     return (filter == mode);
 }
 
+// -----
 // int color_filter(char* path, struct dirent *file, struct option opt);
 // int link_filter(char* path, struct dirent *file, struct option opt);
 // int threads_filter(char* path, struct dirent *file, struct option opt);
 // int ou_filter(char* path, struct dirent *file, struct option opt);
 // int test_filter(char* path, struct dirent *file, struct option opt);
+
+// -----

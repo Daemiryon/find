@@ -99,5 +99,3 @@ tags
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,vim,c
 
 # Other files
-stattest.c
-src/Makefile
