@@ -185,8 +185,8 @@ int date_filter(char* path, struct dirent *file, option *opt)
 */
 {
     struct stat sb;
-    long date;
-    long filter;
+    long int date;
+    long int filter;
     time_t current_time = 0;
     time(&current_time);
     if (stat(path, &sb) == -1) {
