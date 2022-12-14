@@ -138,6 +138,23 @@ int main(int argc, const char *argv[])
         exit(EXIT_SUCCESS);
     }
 
+    int arg_check = 1;
+    for (int i = 0; i < NBOPT; i++)
+    {
+        if (optable[i]->activated)
+        {
+            if (!optable[i]->check_opt_parameter(optable[i]->parameter_value))
+            {
+                printf("Erreur : Parametre invalide pour le flag -%s \n", optable[i]->name);
+                arg_check = 0;
+            }
+        }
+    }
+    if (!arg_check)
+    {
+        exit(EXIT_FAILURE);
+    }
+
     parcour(optable[SOURCE]->parameter_value, optable, 0);
     destroy_optable(optable, NBOPT);
 

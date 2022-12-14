@@ -1,6 +1,6 @@
 #include "parser.h"
 
-option *init_option(char *opt_name, int (*check_opt_parameter)(char *), int (*opt_filter)(char*, struct dirent*, option*))
+option *init_option(char *opt_name, int (*check_opt_parameter)(char *), int (*opt_filter)(char *, struct dirent *, option *))
 {
     option *opt = calloc(1, sizeof(option));
     opt->name = opt_name;
@@ -15,13 +15,13 @@ void destroy_option(option *opt)
     free(opt);
 }
 
-int update_option(option_table opt_list, const char *opt,int index)
+int update_option(option_table opt_list, const char *opt, int index)
 {
     for (unsigned int j = 0; j < 13; j++)
     {
         if (strcmp(opt_list[j]->name, opt) == 0)
         {
-            opt_list[j]->activated = index ;
+            opt_list[j]->activated = index;
             return j;
         }
     }
@@ -34,7 +34,7 @@ int parser(option_table table, int argc, const char *argv[])
     for (int i = 0; i < argc; i++)
     {
         // Cas où on a un paramètre d'option a mettre (si cette option n'a pas déjà de paramètre)
-        if (( table[flag]->check_opt_parameter( (char *) argv[i]) ) & ( !strlen(table[flag]->parameter_value) ))
+        if ((table[flag]->check_opt_parameter((char *)argv[i])) & (!strlen(table[flag]->parameter_value)))
         {
             strcpy(table[flag]->parameter_value, argv[i]);
         }
@@ -42,31 +42,16 @@ int parser(option_table table, int argc, const char *argv[])
         // Cas où on rencontre une option
         else if (argv[i][0] == '-')
         {
-            flag = update_option(table, argv[i] + 1,i+1);
+            flag = update_option(table, argv[i] + 1, i + 1);
             if (flag == -1)
             {
                 printf("Le flag -%s n'est pas correct\n", argv[i] + 1);
                 return 0;
             }
         }
-        
     }
-    int check_val = 1;
-    for (int i = 0; i < 13; i++)
-    {
-        if (table[i]->activated)
-        {
-            if (!table[i]->check_opt_parameter(table[i]->parameter_value))
-            {
-                printf("Erreur : Parametre invalide pour le flag -%s \n",table[i]->name);
-                check_val = 0;
-            }
-            
-        }
-        
-    }    
 
-    return check_val;
+    return 1;
 }
 
 void destroy_optable(option_table optable, int size)
