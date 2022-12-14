@@ -325,13 +325,20 @@ int perm_filter(char* path, struct dirent *file, option *opt)
 */
 {
     struct stat sb;
+    char str[255];
     if (stat(path, &sb) == -1) {
         perror("lstat");
         return 0;
     }
-    int mode = ((int) sb.st_mode) % 1000;
-    int filter = atoi(opt->parameter_value);
-    return (filter == mode);
+    __uintmax_t mode = ((__uintmax_t) sb.st_mode) ;
+    sprintf(str,"%jo",mode) ;
+    char perm[4];
+    for (int i = 3; i > 0; i--)
+    {
+        perm[3-i] = str[strlen(str)-i]; 
+    }
+    char* filter = opt->parameter_value;
+    return (!strcmp(filter,perm));
 }
 
 // -----
