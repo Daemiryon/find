@@ -20,6 +20,15 @@
 
 #define NBOPT 13
 
+#define COLOR_FILE 34
+#define COLOR_FOLDER 33
+#define COLOR_ERROR 31
+
+void colored_print(char *txt, int color)
+{
+    printf("\33[%dm%s\33[0m\n", color, txt);
+}
+
 int check_arg(option **table, int argc, const char *argv[])
 {
     if (argc == 1)
@@ -72,7 +81,14 @@ int parcour(const char *path, option_table table, int depth)
             {
                 if ((!depth) & (filter(path, current, table)))
                 {
-                    printf("%s\n", path);
+                    if (table[COLOR]->activated)
+                    {
+                        colored_print(path, COLOR_FOLDER);
+                    }
+                    else
+                    {
+                        printf("%s\n", path);
+                    }
                     found = 1;
                 }
                 continue;
@@ -85,7 +101,15 @@ int parcour(const char *path, option_table table, int depth)
 
         if (filter(PATH, current, table))
         {
-            printf("%s\n", PATH);
+            if (table[COLOR]->activated)
+            {
+                int color = current->d_type == 4 ? COLOR_FOLDER : COLOR_FILE;
+                colored_print(PATH, color);
+            }
+            else
+            {
+                printf("%s\n", PATH);
+            }
             found = 1;
         }
 
@@ -145,7 +169,8 @@ int main(int argc, const char *argv[])
         {
             if (!optable[i]->check_opt_parameter(optable[i]->parameter_value))
             {
-                printf("Erreur : Parametre invalide pour le flag -%s \n", optable[i]->name);
+                int color = COLOR_ERROR * (optable[COLOR]->activated > 0);
+                printf("\33[%dmErreur : Parametre invalide pour le flag -%s \33[0m\n", color, optable[i]->name);
                 arg_check = 0;
             }
         }
