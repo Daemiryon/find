@@ -51,7 +51,22 @@ int parser(option_table table, int argc, const char *argv[])
         }
         
     }
-    return 1;
+    int check_val = 1;
+    for (int i = 0; i < 13; i++)
+    {
+        if (table[i]->activated)
+        {
+            if (!table[i]->check_opt_parameter(table[i]->parameter_value))
+            {
+                printf("Erreur : Parametre invalide pour le flag -%s \n",table[i]->name);
+                check_val = 0;
+            }
+            
+        }
+        
+    }    
+
+    return check_val;
 }
 
 void destroy_optable(option_table optable, int size)
