@@ -198,12 +198,7 @@ int date_filter(char* path, struct dirent *file, option *opt)
         case '+':
             filter = current_time-((long int) parse_date_param(opt->parameter_value+1));
             date = (long int) sb.st_atime;
-            return (date < filter);
-
-        case '-':
-            filter = current_time-((long int) parse_date_param(opt->parameter_value+1));
-            date = (long int) sb.st_atime;
-            return (date > filter);
+            return (date <= filter);
 
         default:
             filter = current_time-((long int) parse_date_param(opt->parameter_value));
