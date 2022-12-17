@@ -18,7 +18,10 @@ int filter_with_regex(char *regex,char* data)
 */
 {
     regex_t regex_filter;
-    int test = regcomp(&regex_filter,regex,REG_EXTENDED);
+    char reg[512] = "^";
+    strcat(reg,regex);
+    strcat(reg,"$");
+    int test = regcomp(&regex_filter,reg,REG_EXTENDED);
     if (test){
         printf("Regex error\n");
         regfree(&regex_filter);
