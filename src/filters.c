@@ -6,6 +6,17 @@
 #include <sys/sysmacros.h>
 
 // Fonctions auxiliaires
+long get_size(char *path)
+{
+    struct stat sb;
+    if (stat(path, &sb) == -1)
+    {
+        perror("stat");
+        return 0;
+    }
+    return (long)sb.st_size;
+}
+
 int filter_with_regex(char *regex, char *data)
 /*
     Fonction qui vérifie que la regex match avec la donnée.
@@ -281,13 +292,14 @@ int ctc_filter(char *path, struct dirent *file, option *opt)
     La valeur de retour est un booléen.
 */
 {
+    long length = get_size(path);
     int match = 0;
     FILE *f = fopen(path, "r");
+
     if (!f)
     {
         return 0;
     }
-    int length = 20000;
 
     char buffer[length];
 
