@@ -18,6 +18,33 @@ int filter_with_regex(char *regex,char* data)
 */
 {
     regex_t regex_filter;
+    int test = regcomp(&regex_filter,regex,REG_EXTENDED);
+    if (test){
+        printf("Regex error\n");
+        regfree(&regex_filter);
+        return 0;
+    }
+    test = regexec(&regex_filter,data,0,NULL,0);
+    regfree(&regex_filter);
+    if (test == REG_NOMATCH)
+    {
+        return 0;
+    }
+    return 1;
+}
+
+int filter_with_regex_except_ctc(char *regex,char* data)
+/*
+    Fonction qui vérifie que la regex match avec la donnée.
+
+    Paramètres :
+    - regex (char *) : Regex
+    - data (char *) : Donnée à comparer avec la regex
+
+    La valeur de retour est un booléen.
+*/
+{
+    regex_t regex_filter;
     char reg[512] = "^";
     strcat(reg,regex);
     strcat(reg,"$");
@@ -134,7 +161,7 @@ int name_filter(char* path, struct dirent *file, option *opt)
     La valeur de retour est un booléen.
 */
 {
-    return filter_with_regex(opt->parameter_value,file->d_name);
+    return filter_with_regex_except_ctc(opt->parameter_value,file->d_name);
 }
 
 int size_filter(char* path, struct dirent *file, option *opt)
@@ -200,12 +227,12 @@ int date_filter(char* path, struct dirent *file, option *opt)
     {
         case '+':
             filter = (long int) parse_date_param(opt->parameter_value+1);
-            dateFromLastAccess = current_time-((long int) sb.st_mtime);
+            dateFromLastAccess = current_time-((long int) sb.st_atime);
             return (dateFromLastAccess >= filter);
 
         default:
             filter = (long int) parse_date_param(opt->parameter_value);
-            dateFromLastAccess = current_time-((long int) sb.st_mtime);
+            dateFromLastAccess = current_time-((long int) sb.st_atime);
             return (dateFromLastAccess <= filter);
     }
 }
@@ -297,7 +324,7 @@ int dir_filter(char* path, struct dirent *file, option *opt)
     {
         if (strlen(opt->parameter_value))
         {
-            return filter_with_regex(opt->parameter_value,file->d_name);
+            return filter_with_regex_except_ctc(opt->parameter_value,file->d_name);
         }
         else
         {
