@@ -200,12 +200,12 @@ int date_filter(char* path, struct dirent *file, option *opt)
     {
         case '+':
             filter = (long int) parse_date_param(opt->parameter_value+1);
-            dateFromLastAccess = current_time-((long int) sb.st_atime);
+            dateFromLastAccess = current_time-((long int) sb.st_mtime);
             return (dateFromLastAccess >= filter);
 
         default:
             filter = (long int) parse_date_param(opt->parameter_value);
-            dateFromLastAccess = current_time-((long int) sb.st_atime);
+            dateFromLastAccess = current_time-((long int) sb.st_mtime);
             return (dateFromLastAccess <= filter);
     }
 }
