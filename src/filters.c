@@ -7,6 +7,14 @@
 
 // Fonctions auxiliaires
 long get_size(char *path)
+/*
+    Fonction qui renvoie la taille d'un fichier en bytes.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+
+    La valeur de retour est un long int.
+*/
 {
     struct stat sb;
     if (stat(path, &sb) == -1)
@@ -14,7 +22,7 @@ long get_size(char *path)
         perror("stat");
         return 0;
     }
-    return (long)sb.st_size;
+    return (long) sb.st_size;
 }
 
 int filter_with_regex(char *regex, char *data)
@@ -30,37 +38,6 @@ int filter_with_regex(char *regex, char *data)
 {
     regex_t regex_filter;
     int test = regcomp(&regex_filter, regex, REG_EXTENDED);
-    if (test)
-    {
-        printf("Regex error\n");
-        regfree(&regex_filter);
-        return 0;
-    }
-    test = regexec(&regex_filter, data, 0, NULL, 0);
-    regfree(&regex_filter);
-    if (test == REG_NOMATCH)
-    {
-        return 0;
-    }
-    return 1;
-}
-
-int filter_with_regex_except_ctc(char *regex, char *data)
-/*
-    Fonction qui vérifie que la regex match avec la donnée.
-
-    Paramètres :
-    - regex (char *) : Regex
-    - data (char *) : Donnée à comparer avec la regex
-
-    La valeur de retour est un booléen.
-*/
-{
-    regex_t regex_filter;
-    char reg[512] = "^";
-    strcat(reg, regex);
-    strcat(reg, "$");
-    int test = regcomp(&regex_filter, reg, REG_EXTENDED);
     if (test)
     {
         printf("Regex error\n");
@@ -174,7 +151,10 @@ int name_filter(char *path, struct dirent *file, option *opt)
     La valeur de retour est un booléen.
 */
 {
-    return filter_with_regex_except_ctc(opt->parameter_value, file->d_name);
+    char regex[512] = "^";
+    strcat(regex, opt->parameter_value);
+    strcat(regex, "$");
+    return filter_with_regex(regex, file->d_name);
 }
 
 int size_filter(char *path, struct dirent *file, option *opt)
@@ -189,29 +169,20 @@ int size_filter(char *path, struct dirent *file, option *opt)
     La valeur de retour est un booléen.
 */
 {
-    struct stat sb;
-    int size;
     int filter;
-    if (stat(path, &sb) == -1)
-    {
-        perror("stat");
-        return 0;
-    }
+    int size = (int) get_size(path);
     switch (opt->parameter_value[0])
     {
     case '+':
         filter = parse_size_param(opt->parameter_value + 1);
-        size = (int)sb.st_size;
         return (size > filter);
 
     case '-':
         filter = parse_size_param(opt->parameter_value + 1);
-        size = (int)sb.st_size;
         return (size < filter);
 
     default:
         filter = parse_size_param(opt->parameter_value);
-        size = (int)sb.st_size;
         return (size == filter);
     }
 }
@@ -238,16 +209,15 @@ int date_filter(char *path, struct dirent *file, option *opt)
         perror("stat");
         return 0;
     }
+    dateFromLastAccess = current_time - ((long int) sb.st_atime);
     switch (opt->parameter_value[0])
     {
     case '+':
-        filter = (long int)parse_date_param(opt->parameter_value + 1);
-        dateFromLastAccess = current_time - ((long int)sb.st_atime);
+        filter = (long int) parse_date_param(opt->parameter_value + 1);
         return (dateFromLastAccess >= filter);
 
     default:
-        filter = (long int)parse_date_param(opt->parameter_value);
-        dateFromLastAccess = current_time - ((long int)sb.st_atime);
+        filter = (long int) parse_date_param(opt->parameter_value);
         return (dateFromLastAccess <= filter);
     }
 }
@@ -337,7 +307,10 @@ int dir_filter(char *path, struct dirent *file, option *opt)
     {
         if (strlen(opt->parameter_value))
         {
-            return filter_with_regex_except_ctc(opt->parameter_value, file->d_name);
+            char regex[512] = "^";
+            strcat(regex, opt->parameter_value);
+            strcat(regex, "$");
+            return filter_with_regex(regex, file->d_name);
         }
         else
         {
