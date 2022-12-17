@@ -82,7 +82,7 @@ int parser(option_table opt_table, int argc, const char *argv[])
             flag = update_option(opt_table, argv[i]+1, i+1);
             if (flag == -1)
             {
-                printf("-%s flag does not exists\n", argv[i] + 1);
+                printf("Le flag -%s n'est pas correct\n", argv[i] + 1);
                 return 0;
             }
         }

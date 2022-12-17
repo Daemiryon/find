@@ -16,7 +16,7 @@ int check_with_regex(char *param, char *regex)
 */
 {
     regex_t regex_struct;
-    int test = regcomp(&regex_struct,regex,0);
+    int test = regcomp(&regex_struct,regex,REG_EXTENDED);
     if (test){
         printf("Regex error\n");
         regfree(&regex_struct);
@@ -87,7 +87,7 @@ int check_size_param(char *param)
     La valeur de retour est un booléen.
 */
 {
-    return check_with_regex(param,"[+-]\\?[0-9]\\+[ckMG]");
+    return check_with_regex(param,"[+-]?[0-9]+[ckMG]");
 }
 
 int check_date_param(char *param)
@@ -104,7 +104,7 @@ int check_date_param(char *param)
     La valeur de retour est un booléen.
 */
 {
-    return check_with_regex(param,"[+]\\?[0-9]\\+[jhm]");
+    return check_with_regex(param,"[+]?[0-9]+[jhm]");
 }
 
 int check_mime_param(char *param)
@@ -191,7 +191,7 @@ int check_threads_param(char *param)
     La valeur de retour est un booléen.
 */
 {
-    return check_with_regex(param,"[0-9]\\+");
+    return check_with_regex(param,"[0-9]+");
 }
 
 int check_source_param(char *param)
