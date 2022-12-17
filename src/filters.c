@@ -301,7 +301,7 @@ int ctc_filter(char *path, struct dirent *file, option *opt)
         return 0;
     }
 
-    char buffer[length];
+    char *buffer = calloc(1, length);
 
     while (fgets(buffer, length, f) && !match)
     {
@@ -309,7 +309,7 @@ int ctc_filter(char *path, struct dirent *file, option *opt)
     }
 
     fclose(f);
-
+    free(buffer);
     return match;
 }
 
