@@ -1,6 +1,4 @@
 # Macros
-# exec = clang -Wall -Wextra -pedantic -O0 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address
-# comp = clang -c -Wall -Wextra -pedantic -O0 -g3 -fno-omit-frame-pointer -fno-optimize-sibling-calls -fsanitize=address
 exec = clang -Wall
 comp = clang -c -Wall 
 toexe = -o
@@ -8,15 +6,11 @@ toobj = -o
 
 # -----
 # Exécutable
-# # fichier.exe: dépendances .o
-# # 	$(exec) .o $(toexe) fichier.exe
 ftc: ftc.o parser.o check_param.o MegaMimes.o filters.o
 	$(exec) ftc.o parser.o check_param.o MegaMimes.o filters.o $(toexe) ftc
 
 # -----
 # Compilation
-# # fichier.o: dépendances (le .c et les .h)
-# # 	$(comp) .c $(toobj) fichier.o
 parser.o: src/parser.h src/parser.c
 	$(comp) src/parser.c $(toobj) parser.o
 
@@ -37,6 +31,6 @@ filters.o: src/filters.h src/filters.c
 	$(comp) src/filters.c $(toobj) filters.o
 
 # -----
-# clean obj and exe repertories
+# Clean object and executable files
 clean:
 	@rm -f *.o ftc

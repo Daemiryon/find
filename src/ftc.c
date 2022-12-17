@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 
+// Attribution à chaque option d'un indice donnant sa position dans le tableau opt_table
 #define NAME 0
 #define SIZE 1
 #define DATE 2
@@ -18,29 +19,58 @@
 #define TEST 11
 #define SOURCE 12
 
+// Nombre d'options de la commande (source incluse)
 #define NBOPT 13
 
+// Définition des couleurs
 #define COLOR_FILE 34
 #define COLOR_FOLDER 33
 #define COLOR_ERROR 31
 
 void colored_print(char *txt, int color)
+/*
+    Fonction qui affiche en sortie standard le paramètre txt avec la couleur souhaitée. Utilise la coloration avec les escape characters.
+
+    Paramètres :
+    - txt (char *) : Chaîne de caractère à afficher
+    - color (int) : Valeur de la couleur
+*/
 {
     printf("\33[%dm%s\33[0m\n", color, txt);
 }
 
-int check_arg(option **table, int argc, const char *argv[])
+int check_arg(option **opt_table, int argc, const char *argv[])
+/*
+    Fonction qui vérifie que le paramètre de la commande a bien été indiqué (renvoie une erreur sinon) et appelle la fonction parser (cf fichiers parser.h et parser.c).
+
+    Paramètres :
+    - txt (option **) : Chaîne de caractère à afficher
+    - color (int) : Valeur de la couleur
+
+    La valeur de retour est un booléen.
+*/
 {
     if (argc == 1)
     {
         printf("Missing argument\n");
         return 0;
     }
-
-    return parser(table, argc - 1, argv + 1);
+    return parser(opt_table, argc-1, argv+1);
 }
 
-int filter(char *path, struct dirent *file, option_table table)
+int filter(char *path, struct dirent *file, option_table opt_table)
+/*
+    Fonction qui passe le fichier en paramètre dans les filtres de toutes les options.
+    La valeur de retour dépend de si l'option -OU est activée. Dans ce cas, au moins un des filtres doit accepter le fichier.
+    Dans le cas contraire, tous les filtres doivent accepter le fichier.
+
+    Paramètres :
+    - path (char *) : chemin du fichier
+    - file (struct dirent) : fichier
+    - opt_table (option_table) : Tableau des options de la commande
+
+    La valeur de retour est un booléen.
+*/
 {
     int ANDcheck = 1;
     int ORcheck = 0;
@@ -48,18 +78,28 @@ int filter(char *path, struct dirent *file, option_table table)
     for (int i = 0; i < 12; i++)
     {
 
-        if ((table[i]->opt_filter != NULL) & (table[i]->activated > 0))
+        if ((opt_table[i]->opt_filter != NULL) & (opt_table[i]->activated > 0))
         {
-            int b = table[i]->opt_filter(path, file, table[i]);
+            int b = opt_table[i]->opt_filter(path, file, opt_table[i]);
             ANDcheck = ANDcheck & b;
             ORcheck = ORcheck | b;
         }
     }
-    int check = table[OU]->activated ? ORcheck : ANDcheck;
+    int check = opt_table[OU]->activated ? ORcheck : ANDcheck;
     return check;
 }
 
-int parcour(const char *path, option_table table, int depth)
+int parcour(char *path, option_table opt_table, int depth)
+/*
+    Fonction qui parcourt l'arborescence des fichiers à partir du chemin spécifié.
+
+    Paramètres :
+    - path (char *) : chemin utilisé comme point de départ du parcours
+    - opt_table (option_table) : Tableau des options de la commande
+    - depth (int) : Profondeur de l'arbre
+
+    La valeur de retour est un booléen.
+*/
 {
     int found = 0;
     struct dirent *current;
@@ -77,11 +117,12 @@ int parcour(const char *path, option_table table, int depth)
 
         if (current->d_name[0] == '.')
         {
+            // Cas du fichier "."
             if (strlen(current->d_name) == 1)
             {
-                if ((!depth) & (filter(path, current, table)))
+                if ((!depth) & (filter(path, current, opt_table)))
                 {
-                    if (table[COLOR]->activated)
+                    if (opt_table[COLOR]->activated)
                     {
                         colored_print(path, COLOR_FOLDER);
                     }
@@ -93,15 +134,17 @@ int parcour(const char *path, option_table table, int depth)
                 }
                 continue;
             }
+            // Fichier ".." non prix en compte
             if (strcmp(current->d_name, "..") == 0)
             {
                 continue;
             }
         }
 
-        if (filter(PATH, current, table))
+        // Autres fichiers (hors répertoires)
+        if (filter(PATH, current, opt_table))
         {
-            if (table[COLOR]->activated)
+            if (opt_table[COLOR]->activated)
             {
                 int color = current->d_type == 4 ? COLOR_FOLDER : COLOR_FILE;
                 colored_print(PATH, color);
@@ -113,9 +156,10 @@ int parcour(const char *path, option_table table, int depth)
             found = 1;
         }
 
+        // Cas des répertoires
         if (current->d_type == 4)
         {
-            found = found | parcour(PATH, table, depth + 1);
+            found = found | parcour(PATH, opt_table, depth + 1);
         }
     }
 
@@ -125,52 +169,56 @@ int parcour(const char *path, option_table table, int depth)
 
 int main(int argc, const char *argv[])
 {
-    option *optable[NBOPT];
+    // Initialisation du tableau d'option
+    option *opt_table[NBOPT];
 
-    optable[NAME] = init_option("name", &check_name_param, &name_filter);
-    optable[SIZE] = init_option("size", &check_size_param, &size_filter);
-    optable[DATE] = init_option("date", &check_date_param, &date_filter);
-    optable[MIME] = init_option("mime", &check_mime_param, &mime_filter);
-    optable[CTC] = init_option("ctc", &check_ctc_param, &ctc_filter);
-    optable[_DIR] = init_option("dir", &check_dir_param, &dir_filter);
-    optable[COLOR] = init_option("color", &check_no_param, NULL);
-    optable[PERM] = init_option("perm", &check_perm_param, &perm_filter);
-    optable[LINK] = init_option("link", &check_no_param, &no_filter);
-    optable[THREADS] = init_option("threads", &check_threads_param, NULL);
-    optable[OU] = init_option("ou", &check_no_param, NULL);
-    optable[TEST] = init_option("test", &check_no_param, NULL);
-    optable[SOURCE] = init_option("source", &check_source_param, NULL);
+    opt_table[NAME] = init_option("name", &check_name_param, &name_filter);
+    opt_table[SIZE] = init_option("size", &check_size_param, &size_filter);
+    opt_table[DATE] = init_option("date", &check_date_param, &date_filter);
+    opt_table[MIME] = init_option("mime", &check_mime_param, &mime_filter);
+    opt_table[CTC] = init_option("ctc", &check_ctc_param, &ctc_filter);
+    opt_table[_DIR] = init_option("dir", &check_dir_param, &dir_filter);
+    opt_table[COLOR] = init_option("color", &check_no_param, NULL);
+    opt_table[PERM] = init_option("perm", &check_perm_param, &perm_filter);
+    opt_table[LINK] = init_option("link", &check_no_param, &no_filter);
+    opt_table[THREADS] = init_option("threads", &check_threads_param, NULL);
+    opt_table[OU] = init_option("ou", &check_no_param, NULL);
+    opt_table[TEST] = init_option("test", &check_no_param, NULL);
+    opt_table[SOURCE] = init_option("source", &check_source_param, NULL);
 
-    optable[SOURCE]->activated = 1;
+    opt_table[SOURCE]->activated = 1;
 
-    if (!check_arg(optable, argc, argv))
+    // Parcours de l'argv et vérification des paramètres des options
+    if (!check_arg(opt_table, argc, argv))
     {
         exit(EXIT_FAILURE);
     }
 
-    if (optable[TEST]->activated)
+    // Cas où l'option -test est activée. Dans ce cas, affiche sur l'entrée standard le paramètre de la première option activée rencontrée lors du parcours de opt_table
+    if (opt_table[TEST]->activated)
     {
         for (int i = 0; i < NBOPT - 2; i++)
         {
-            if ((optable[i]->activated))
+            if ((opt_table[i]->activated))
             {
-                printf("La valeur du flag -%s est %s\n", optable[i]->name, argv[optable[i]->activated + 1]);
+                printf("La valeur du flag -%s est %s\n", opt_table[i]->name, argv[opt_table[i]->activated + 1]);
                 break;
             }
         }
-        destroy_optable(optable, NBOPT);
+        destroy_option_table(opt_table, NBOPT);
         exit(EXIT_SUCCESS);
     }
 
+    // Affichage des messages d'erreurs indiquant que les paramètres des options activées sont incorrects (Si c'est le cas)
     int arg_check = 1;
     for (int i = 0; i < NBOPT; i++)
     {
-        if (optable[i]->activated)
+        if (opt_table[i]->activated)
         {
-            if (!optable[i]->check_opt_parameter(optable[i]->parameter_value))
+            if (!opt_table[i]->check_opt_parameter(opt_table[i]->parameter_value))
             {
-                int color = COLOR_ERROR * (optable[COLOR]->activated > 0);
-                printf("\33[%dmErreur : Parametre invalide pour le flag -%s \33[0m\n", color, optable[i]->name);
+                int color = COLOR_ERROR * (opt_table[COLOR]->activated > 0);
+                printf("\33[%dmError : Invalid argument for flag -%s \33[0m\n", color, opt_table[i]->name);
                 arg_check = 0;
             }
         }
@@ -180,8 +228,9 @@ int main(int argc, const char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    parcour(optable[SOURCE]->parameter_value, optable, 0);
-    destroy_optable(optable, NBOPT);
+    // Parcours et filtrage des fichiers de l'arborescence
+    parcour(opt_table[SOURCE]->parameter_value, opt_table, 0);
 
+    destroy_option_table(opt_table, NBOPT);
     return 0;
 }
