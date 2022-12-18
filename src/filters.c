@@ -209,7 +209,7 @@ int date_filter(char *path, struct dirent *file, option *opt)
         perror("stat");
         return 0;
     }
-    dateFromLastAccess = current_time - ((long int) sb.st_atime);
+    dateFromLastAccess = current_time - ((long int) sb.st_mtime);
     switch (opt->parameter_value[0])
     {
     case '+':
